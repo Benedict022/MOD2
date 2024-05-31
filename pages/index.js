@@ -8,6 +8,7 @@ export default function HomePage() {
   const [atm, setATM] = useState(undefined);
   const [balance, setBalance] = useState(undefined);
   const [showReceipt, setShowReceipt] = useState(false); // New state variable for showing receipt text
+  const [randomSandwich, setRandomSandwich] = useState("");
 
   const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
   const atmABI = atm_abi.abi;
@@ -61,7 +62,7 @@ export default function HomePage() {
 
   const deposit = async () => {
     if (atm) {
-      let tx = await atm.deposit(10);
+      let tx = await atm.deposit(100);
       await tx.wait();
       getBalance();
     }
@@ -69,12 +70,48 @@ export default function HomePage() {
 
   const withdraw = async () => {
     if (atm) {
-      let tx = await atm.withdraw(10);
+      let tx = await atm.withdraw(100);
       await tx.wait();
       getBalance();
     }
   };
 
+  const getAll = async () => {
+    if (atm && balance !== undefined) {
+      // Withdraw entire balance
+      let tx = await atm.withdraw(balance);
+      await tx.wait();
+      getBalance();
+    }
+  };
+
+  const randomizeSandwich = async () => {
+    const SandwichList = [
+      { name: "Double Cheese Burger", cost: 100 },
+      { name: "Burger Mcdo", cost: 80 },
+      { name: "Crispy Chicken Sandwich", cost: 90 },
+      { name: "Quarter Pounder", cost: 70 },
+      { name: "Cheese Burger", cost: 85 }
+    ];
+
+    const randomIndex = Math.floor(Math.random() * SandwichList.length);
+    const selectedSandwich = SandwichList[randomIndex];
+
+    if (atm) {
+      let tx = await atm.withdraw(selectedSandwich.cost);
+      await tx.wait();
+      getBalance();
+    }
+
+    setRandomSandwich(selectedSandwich.name);
+  };
+
+  const exit = () => {
+    setAccount(undefined);
+    setATM(undefined);
+    setBalance(undefined);
+  };
+  
   const printReceipt = () => {
     setShowReceipt(true);
     setTimeout(() => setShowReceipt(false), 3000); // Hide the receipt text after 3 seconds
@@ -101,10 +138,14 @@ export default function HomePage() {
       <div>
         <p>Your Account: {account}</p>
         <p>Your Balance: {balance}</p>
-        <button onClick={deposit}>Deposit 10 ETH</button>
-        <button onClick={withdraw}>Withdraw 10 ETH</button>
-        <button onClick={printReceipt}>Print Receipt</button> {/* New button */}
+        <button onClick={deposit}>Deposit 100 ETH</button>
+        <button onClick={withdraw}>Withdraw 100 ETH</button>
+        <button style={{backgroundColor: '#008CBA' }} onClick={getAll}>Get all the Token</button>
+        <button style={{backgroundColor: '#357cf0' }} onClick={randomizeSandwich}>Randomize Sandwich</button>
+            <p style={{ fontSize: '1.2rem' }}>Random Sandwich: {randomSandwich}</p>
+        <button style={{backgroundColor: '#0af024'}} onClick={printReceipt}>Print Receipt</button> {/* New button */}
         {showReceipt && <p>Printing receipt</p>} {/* Conditional rendering of the receipt text */}
+        <button style={{ backgroundColor: '#f0d10a' }} onClick={exit}>Refresh</button>
       </div>
     );
   };
