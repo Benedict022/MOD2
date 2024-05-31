@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract EthereumATM {
+contract BurgerMcdo {
     address owner;
     mapping(address => uint256) balances;
 
